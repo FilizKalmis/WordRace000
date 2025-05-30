@@ -1,0 +1,68 @@
+@model WordRace000.Models.Word
+
+@{
+    ViewData["Title"] = "Kelime Düzenle";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="text-center">Kelime Düzenle</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+
+                <div class="form-group mb-3">
+                    <label asp-for="English" class="form-label">İngilizce</label>
+                    <input asp-for="English" class="form-control" required />
+                    <span asp-validation-for="English" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Turkish" class="form-label">Türkçe</label>
+                    <input asp-for="Turkish" class="form-control" required />
+                    <span asp-validation-for="Turkish" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Example" class="control-label">Örnek Cümle</label>
+                    <textarea asp-for="Example" class="form-control"></textarea>
+                    <span asp-validation-for="Example" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="CategoryId" class="form-label">Kategori</label>
+                    <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Categories"></select>
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Difficulty" class="control-label">Zorluk Seviyesi</label>
+                    <select asp-for="Difficulty" class="form-control">
+                        <option value="1">Kolay</option>
+                        <option value="2">Orta</option>
+                        <option value="3">Zor</option>
+                    </select>
+                    <span asp-validation-for="Difficulty" class="text-danger"></span>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>
+                        Kaydet
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Geri Dön
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

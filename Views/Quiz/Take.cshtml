@@ -1,0 +1,46 @@
+@model WordRace000.Models.QuizDetail
+
+@{
+    ViewData["Title"] = "Quiz";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="text-center">Quiz #@Model.QuizId</h3>
+        </div>
+        <div class="card-body">
+            <div class="text-center mb-4">
+                <h4>@Model.Word.English</h4>
+                <p class="text-muted">Bu kelimenin Türkçe karşılığını yazın</p>
+            </div>
+
+            <form asp-controller="Quiz" asp-action="Answer" method="post" class="mt-4">
+                <input type="hidden" name="quizDetailId" value="@Model.Id" />
+                
+                <div class="form-group">
+                    <input type="text" name="answer" class="form-control form-control-lg text-center" 
+                           required autofocus autocomplete="off" />
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        Cevapla
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Enter tuşu ile formu gönder
+        document.querySelector('input[name="answer"]').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.querySelector('form').submit();
+            }
+        });
+    </script>
+}

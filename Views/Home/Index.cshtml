@@ -1,0 +1,67 @@
+﻿@{
+    ViewData["Title"] = "WordRace - Kelime Öğrenme Uygulaması";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h1 class="display-4 mb-4">WordRace'e Hoş Geldiniz!</h1>
+            <p class="lead mb-5">
+                Eğlenceli ve etkili bir şekilde yeni kelimeler öğrenin. 
+                6 aşamalı öğrenme algoritması ile kalıcı öğrenme sağlayın.
+            </p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h3 class="card-title mb-4">Başlamak için:</h3>
+                    <div class="d-grid gap-3">
+                        <a href="/Account/Login" class="btn btn-primary btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Giriş Yap
+                        </a>
+                        <a href="/Account/Register" class="btn btn-success btn-lg">
+                            <i class="fas fa-user-plus me-2"></i>Kayıt Ol
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    <i class="fas fa-book fa-3x text-primary mb-3"></i>
+                    <h4>300+ Kelime</h4>
+                    <p>Özenle seçilmiş kelime havuzu</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    <i class="fas fa-graduation-cap fa-3x text-success mb-3"></i>
+                    <h4>Akıllı Öğrenme</h4>
+                    <p>6 aşamalı öğrenme sistemi</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    <i class="fas fa-gamepad fa-3x text-info mb-3"></i>
+                    <h4>Eğlenceli Oyunlar</h4>
+                    <p>Wordle ve Word Chain</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+}

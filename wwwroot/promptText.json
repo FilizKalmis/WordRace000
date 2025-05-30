@@ -1,0 +1,486 @@
+﻿[
+    {
+        "Id": 1,
+        "PromptText": "A fresh, shiny red apple on a wooden table."
+    },
+    {
+        "Id": 2,
+        "PromptText": "A bunch of yellow bananas hanging on a tree."
+    },
+    {
+        "Id": 3,
+        "PromptText": "A juicy orange with leaves on a rustic table."
+    },
+    {
+        "Id": 4,
+        "PromptText": "A ripe peach with soft fuzz and a leaf."
+    },
+    {
+        "Id": 5,
+        "PromptText": "A bowl full of fresh strawberries."
+    },
+    {
+        "Id": 6,
+        "PromptText": "A cluster of green grapes with water drops."
+    },
+    {
+        "Id": 7,
+        "PromptText": "A sliced pineapple with tropical leaves."
+    },
+    {
+        "Id": 8,
+        "PromptText": "A large watermelon cut open on a picnic table."
+    },
+    {
+        "Id": 9,
+        "PromptText": "A pair of red cherries with stems."
+    },
+    {
+        "Id": 10,
+        "PromptText": "A sliced lemon with fresh mint leaves."
+    },
+    {
+        "Id": 11,
+        "PromptText": "A basket of apricots with green leaves."
+    },
+    {
+        "Id": 12,
+        "PromptText": "A sweet melon cut into slices."
+    },
+    {
+        "Id": 13,
+        "PromptText": "A plum with a shiny purple skin."
+    },
+    {
+        "Id": 14,
+        "PromptText": "A fig cut in half showing the inside."
+    },
+    {
+        "Id": 15,
+        "PromptText": "A pomegranate split open showing seeds."
+    },
+    {
+        "Id": 16,
+        "PromptText": "A bowl of fresh blackberries."
+    },
+    {
+        "Id": 17,
+        "PromptText": "A cluster of ripe raspberries."
+    },
+    {
+        "Id": 18,
+        "PromptText": "A sliced kiwi fruit on a wooden board."
+    },
+    {
+        "Id": 19,
+        "PromptText": "A coconut cut in half with white flesh."
+    },
+    {
+        "Id": 20,
+        "PromptText": "A ripe avocado cut open showing the seed."
+    },
+    {
+        "Id": 21,
+        "PromptText": "A bowl of blueberries with leaves."
+    },
+    {
+        "Id": 22,
+        "PromptText": "A sliced grapefruit with a vibrant pink center."
+    },
+    {
+        "Id": 23,
+        "PromptText": "A bunch of guava fruits."
+    },
+    {
+        "Id": 24,
+        "PromptText": "A ripe papaya cut open with seeds."
+    },
+    {
+        "Id": 25,
+        "PromptText": "A passion fruit with purple skin and juicy seeds."
+    },
+    {
+        "Id": 26,
+        "PromptText": "A fresh mango with golden flesh."
+    },
+    {
+        "Id": 27,
+        "PromptText": "A peeled tangerine with segments."
+    },
+    {
+        "Id": 28,
+        "PromptText": "A bunch of lychee fruits with red skin."
+    },
+    {
+        "Id": 29,
+        "PromptText": "A starfruit cut in star shapes."
+    },
+    {
+        "Id": 30,
+        "PromptText": "A bunch of fresh carrots with green leaves."
+    },
+
+    {
+        "Id": 31,
+        "PromptText": "A fresh, crisp cucumber sliced on a wooden cutting board."
+    },
+    {
+        "Id": 32,
+        "PromptText": "A vibrant bunch of carrots with green tops on a rustic table."
+    },
+    {
+        "Id": 33,
+        "PromptText": "A deep purple eggplant resting beside other colorful vegetables."
+    },
+    {
+        "Id": 34,
+        "PromptText": "Bright green broccoli florets in a bowl."
+    },
+    {
+        "Id": 35,
+        "PromptText": "A handful of cherry tomatoes on a vine."
+    },
+    {
+        "Id": 36,
+        "PromptText": "A steaming bowl of green peas with a butter pat on top."
+    },
+    {
+        "Id": 37,
+        "PromptText": "A single red bell pepper sliced open to show its seeds."
+    },
+    {
+        "Id": 38,
+        "PromptText": "A pile of golden potatoes with a few cut open."
+    },
+    {
+        "Id": 39,
+        "PromptText": "Fresh spinach leaves glistening with water drops."
+    },
+    {
+        "Id": 40,
+        "PromptText": "A rustic market basket filled with different kinds of onions."
+    },
+    {
+        "Id": 41,
+        "PromptText": "A head of green cabbage cut in half."
+    },
+    {
+        "Id": 42,
+        "PromptText": "A close-up of a beetroot with its leaves."
+    },
+    {
+        "Id": 43,
+        "PromptText": "A small pile of green beans on a plate."
+    },
+    {
+        "Id": 44,
+        "PromptText": "An orange pumpkin in a field."
+    },
+    {
+        "Id": 45,
+        "PromptText": "A few cloves of garlic on a kitchen counter."
+    },
+    {
+        "Id": 46,
+        "PromptText": "A shiny red radish with its leaves attached."
+    },
+    {
+        "Id": 47,
+        "PromptText": "A bowl of fresh corn kernels."
+    },
+    {
+        "Id": 48,
+        "PromptText": "A close-up of an artichoke."
+    },
+    {
+        "Id": 49,
+        "PromptText": "A single green zucchini placed beside a knife."
+    },
+    {
+        "Id": 50,
+        "PromptText": "A plate with grilled asparagus."
+    },
+    {
+        "Id": 51,
+        "PromptText": "Fresh leeks sliced on a wooden board."
+    },
+    {
+        "Id": 52,
+        "PromptText": "A purple cabbage next to a green one."
+    },
+    {
+        "Id": 53,
+        "PromptText": "A glass bowl of mixed lettuce leaves."
+    },
+    {
+        "Id": 54,
+        "PromptText": "A handful of fresh parsley tied with twine."
+    },
+    {
+        "Id": 55,
+        "PromptText": "A bunch of bright green celery sticks."
+    },
+    {
+        "Id": 56,
+        "PromptText": "A mushroom basket with various mushroom types."
+    },
+    {
+        "Id": 57,
+        "PromptText": "A yellow squash beside other vegetables."
+    },
+    {
+        "Id": 58,
+        "PromptText": "A fresh turnip with its leaves."
+    },
+    {
+        "Id": 59,
+        "PromptText": "A pile of fresh okra."
+    },
+    {
+        "Id": 60,
+        "PromptText": "Fresh dill sprigs arranged neatly."
+    },
+
+    {
+        "Id": 91,
+        "PromptText": "The teacher explained the lesson clearly."
+    },
+    {
+        "Id": 92,
+        "PromptText": "The student finished the homework early."
+    },
+    {
+        "Id": 93,
+        "PromptText": "Our school is very big."
+    },
+    {
+        "Id": 94,
+        "PromptText": "We have a math lesson today."
+    },
+    {
+        "Id": 95,
+        "PromptText": "I forgot to do my homework."
+    },
+    {
+        "Id": 96,
+        "PromptText": "The exam was difficult."
+    },
+    {
+        "Id": 97,
+        "PromptText": "I borrowed a book from the library."
+    },
+    {
+        "Id": 98,
+        "PromptText": "I bought a new notebook."
+    },
+    {
+        "Id": 99,
+        "PromptText": "I lost my pen."
+    },
+    {
+        "Id": 100,
+        "PromptText": "She sharpened her pencil."
+    },
+    {
+        "Id": 101,
+        "PromptText": "Our classroom is clean."
+    },
+    {
+        "Id": 102,
+        "PromptText": "This subject is interesting."
+    },
+    {
+        "Id": 103,
+        "PromptText": "My sister studies at university."
+    },
+    {
+        "Id": 104,
+        "PromptText": "He received his diploma."
+    },
+    {
+        "Id": 105,
+        "PromptText": "I got a degree in history."
+    },
+    {
+        "Id": 106,
+        "PromptText": "The lecture starts at nine."
+    },
+    {
+        "Id": 107,
+        "PromptText": "She is doing research on plants."
+    },
+    {
+        "Id": 108,
+        "PromptText": "Our project is about animals."
+    },
+    {
+        "Id": 109,
+        "PromptText": "The teacher’s name is Ali."
+    },
+    {
+        "Id": 110,
+        "PromptText": "The student asked a question."
+    },
+    {
+        "Id": 111,
+        "PromptText": "I need a new board."
+    },
+    {
+        "Id": 112,
+        "PromptText": "He drew a line with a ruler."
+    },
+    {
+        "Id": 113,
+        "PromptText": "I lost my eraser."
+    },
+    {
+        "Id": 114,
+        "PromptText": "We have an exam paper tomorrow."
+    },
+    {
+        "Id": 115,
+        "PromptText": "He got a scholarship."
+    },
+    {
+        "Id": 116,
+        "PromptText": "Our schedule is full."
+    },
+    {
+        "Id": 117,
+        "PromptText": "She will make a presentation."
+    },
+    {
+        "Id": 118,
+        "PromptText": "Attendance is important."
+    },
+    {
+        "Id": 119,
+        "PromptText": "Graduation is next week."
+    },
+    {
+        "Id": 120,
+        "PromptText": "The table is made of wood."
+    },
+
+
+    {
+        "Id": 121,
+        "PromptText": "I sat on the chair."
+    },
+    {
+        "Id": 122,
+        "PromptText": "Turn on the lamp."
+    },
+    {
+        "Id": 123,
+        "PromptText": "I lost my phone."
+    },
+    {
+        "Id": 124,
+        "PromptText": "The computer is new."
+    },
+    {
+        "Id": 125,
+        "PromptText": "She bought a bag."
+    },
+    {
+        "Id": 126,
+        "PromptText": "I forgot my key."
+    },
+    {
+        "Id": 127,
+        "PromptText": "Drink water from the bottle."
+    },
+    {
+        "Id": 128,
+        "PromptText": "Look at the clock."
+    },
+    {
+        "Id": 129,
+        "PromptText": "He wears a watch."
+    },
+    {
+        "Id": 130,
+        "PromptText": "The pillow is soft."
+    },
+    {
+        "Id": 131,
+        "PromptText": "I need a blanket."
+    },
+    {
+        "Id": 132,
+        "PromptText": "Close the door."
+    },
+    {
+        "Id": 133,
+        "PromptText": "Open the window."
+    },
+    {
+        "Id": 134,
+        "PromptText": "Pick up your pen."
+    },
+    {
+        "Id": 135,
+        "PromptText": "My wallet is missing."
+    },
+    {
+        "Id": 136,
+        "PromptText": "Put it in the box."
+    },
+    {
+        "Id": 137,
+        "PromptText": "Use the remote."
+    },
+    {
+        "Id": 138,
+        "PromptText": "I bought new headphones."
+    },
+    {
+        "Id": 139,
+        "PromptText": "Wear your shoes."
+    },
+    {
+        "Id": 140,
+        "PromptText": "Look in the mirror."
+    },
+    {
+        "Id": 141,
+        "PromptText": "Open the curtain."
+    },
+    {
+        "Id": 142,
+        "PromptText": "Use scissors carefully."
+    },
+    {
+        "Id": 143,
+        "PromptText": "Put food on the plate."
+    },
+    {
+        "Id": 144,
+        "PromptText": "Use a fork to eat."
+    },
+    {
+        "Id": 145,
+        "PromptText": "Stir with a spoon."
+    },
+    {
+        "Id": 146,
+        "PromptText": "Cut it with a knife."
+    },
+    {
+        "Id": 147,
+        "PromptText": "Throw it in the trash can."
+    },
+    {
+        "Id": 148,
+        "PromptText": "Turn on the fan."
+    },
+    {
+        "Id": 149,
+        "PromptText": "Watch TV tonight."
+    },
+    {
+        "Id": 150,
+        "PromptText": "They run every morning."
+    }
+]

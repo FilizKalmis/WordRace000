@@ -1,0 +1,71 @@
+@{
+    ViewData["Title"] = "Ana Sayfa";
+}
+
+<div class="container mt-4">
+    <div class="text-center mb-5">
+        <h1 class="display-4">WordRace'e Hoş Geldiniz!</h1>
+        <p class="lead">Eğlenceli ve etkili bir şekilde yeni kelimeler öğrenin. 6 aşamalı öğrenme algoritması ile kalıcı öğrenme sağlayın.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-book fa-3x mb-3 text-primary"></i>
+                    <h3>300+ Kelime</h3>
+                    <p>Özenle seçilmiş kelime havuzu</p>
+                    <a asp-controller="Word" asp-action="Index" class="btn btn-primary">Kelimelere Göz At</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-graduation-cap fa-3x mb-3 text-success"></i>
+                    <h3>Akıllı Öğrenme</h3>
+                    <p>6 aşamalı öğrenme sistemi</p>
+                    <a asp-controller="Quiz" asp-action="Create" class="btn btn-success">Quiz'e Başla</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-gamepad fa-3x mb-3 text-info"></i>
+                    <h3>Eğlenceli Oyunlar</h3>
+                    <p>Wordle ve Word Chain</p>
+                    <div class="btn-group">
+                        <a asp-controller="Wordle" asp-action="Index" class="btn btn-info">Wordle</a>
+                        <a asp-controller="WordChain" asp-action="Index" class="btn btn-info">Word Chain</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6 offset-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title text-center">Günlük İlerleme</h4>
+                    <div class="progress mb-3">
+                        <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                    </div>
+                    <p class="text-center mb-0">
+                        <a asp-controller="Profile" asp-action="Index" class="btn btn-outline-primary">Profilime Git</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Günlük ilerlemeyi güncelle (backend'den alınacak)
+        // Örnek: document.querySelector('.progress-bar').style.width = '45%';
+    </script>
+} 
