@@ -13,7 +13,7 @@ namespace WordRace000.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Category> Category { get; set; }
         public DbSet<Word> Words { get; set; }
-        public DbSet<WordSample> WordSamples { get; set; }
+        public DbSet<WordSample> WordSample { get; set; }
         public DbSet<WordSampleWord> WordSampleWords { get; set; }
         public DbSet<Quiz> Quizzes { get; set; }
         public DbSet<QuizDetail> QuizDetails { get; set; }
@@ -23,7 +23,7 @@ namespace WordRace000.Data
         public DbSet<WordLog> WordLogs { get; set; }
         public DbSet<Settings> Settings { get; set; }
         public DbSet<AnalysisReport> AnalysisReports { get; set; }
-        public DbSet<WordleGame> WordleGames { get; set; }
+        public DbSet<WordleGame> WordleGame { get; set; }
         public DbSet<WordChainStory> WordChainStories { get; set; }
         public DbSet<ExamResult> ExamResults { get; set; }
 

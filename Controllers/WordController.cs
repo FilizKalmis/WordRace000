@@ -149,5 +149,15 @@ namespace WordRace000.Controllers
         {
             return _context.Words.Any(e => e.Id == id);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CheckWordExists([FromBody] string word)
+        {
+            var exists = await _context.Words.AnyAsync(w => 
+                w.English.ToLower() == word.ToLower() || 
+                w.Turkish.ToLower() == word.ToLower());
+            
+            return Json(new { exists });
+        }
     }
 } 

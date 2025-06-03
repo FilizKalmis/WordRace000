@@ -10,16 +10,22 @@
             <h3 class="text-center">Yeni Kelime Ekle</h3>
         </div>
         <div class="card-body">
-            <form asp-action="Create" method="post">
+            <form asp-action="Create" method="post" id="createWordForm">
                 <div class="form-group mb-3">
                     <label asp-for="English" class="form-label">İngilizce</label>
-                    <input asp-for="English" class="form-control" required />
+                    <input asp-for="English" class="form-control word-input" required />
+                    <div class="invalid-feedback word-exists-message" style="display: none;">
+                        Bu kelime zaten mevcut!
+                    </div>
                     <span asp-validation-for="English" class="text-danger"></span>
                 </div>
 
                 <div class="form-group mb-3">
                     <label asp-for="Turkish" class="form-label">Türkçe</label>
-                    <input asp-for="Turkish" class="form-control" required />
+                    <input asp-for="Turkish" class="form-control word-input" required />
+                    <div class="invalid-feedback word-exists-message" style="display: none;">
+                        Bu kelime zaten mevcut!
+                    </div>
                     <span asp-validation-for="Turkish" class="text-danger"></span>
                 </div>
 
@@ -30,7 +36,7 @@
                 </div>
 
                 <div class="text-center">
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary" id="submitButton">
                         <i class="fas fa-save me-2"></i>
                         Kaydet
                     </button>
@@ -46,4 +52,52 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        let typingTimer;
+        const doneTypingInterval = 500; // yarım saniye
+
+        $('.word-input').on('input', function() {
+            clearTimeout(typingTimer);
+            const input = $(this);
+            
+            typingTimer = setTimeout(function() {
+                checkWordExists(input);
+            }, doneTypingInterval);
+        });
+
+        async function checkWordExists(input) {
+            const word = input.val();
+            if (!word) return;
+
+            try {
+                const response = await fetch('/Word/CheckWordExists', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(word)
+                });
+
+                const data = await response.json();
+                
+                const feedback = input.siblings('.word-exists-message');
+                if (data.exists) {
+                    input.addClass('is-invalid');
+                    feedback.show();
+                    $('#submitButton').prop('disabled', true);
+                } else {
+                    input.removeClass('is-invalid');
+                    feedback.hide();
+                    
+                    // Diğer input da geçerliyse butonu aktif et
+                    const otherInput = $('.word-input').not(input);
+                    if (!otherInput.hasClass('is-invalid')) {
+                        $('#submitButton').prop('disabled', false);
+                    }
+                }
+            } catch (error) {
+                console.error('Hata:', error);
+            }
+        }
+    </script>
 }

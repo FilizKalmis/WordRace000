@@ -152,6 +152,12 @@ namespace WordRace000.Controllers
             return View(settings);
         }
 
+        // GET: Profile/ChangePassword
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
         // POST: Profile/ChangePassword
         [HttpPost]
         [ValidateAntiForgeryToken]

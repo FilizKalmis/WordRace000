@@ -1,0 +1,29 @@
+@{
+    ViewData["Title"] = "Word Chain Oyna";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div id="word-chain" class="mb-4">
+                <!-- Kelime zinciri burada gösterilecek -->
+            </div>
+            <div class="input-group mb-3">
+                <input type="text" id="word-input" class="form-control" placeholder="Yeni kelime girin">
+                <button class="btn btn-primary" type="button" id="add-word">Ekle</button>
+            </div>
+            <div class="alert alert-info" role="alert">
+                Son harf: <span id="last-letter">-</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Oyun mantığı burada olacak
+        document.addEventListener('DOMContentLoaded', function() {
+            // Oyun başlangıç kodları
+        });
+    </script>
+} 

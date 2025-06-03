@@ -6,6 +6,7 @@ namespace WordRace000.Models
     [Table("Words")]
     public class Word
     {
+        [Key]
         public int Id { get; set; }
 
         [Required]
@@ -18,11 +19,19 @@ namespace WordRace000.Models
         [Column("TurkishMeaning")]
         public string Turkish { get; set; }
 
+        [MaxLength(500)]
         public string? Example { get; set; }
+
+        [MaxLength(255)]
         public string? ImageUrl { get; set; }
+
+        [MaxLength(255)]
         public string? AudioUrl { get; set; }
+
+        [Range(1, 5)]
         public int Difficulty { get; set; }
 
+        [Required]
         public int CategoryId { get; set; }
 
         [ForeignKey("CategoryId")]
@@ -44,8 +53,8 @@ namespace WordRace000.Models
             QuizDetails = new HashSet<QuizDetail>();
             QuizSchedules = new HashSet<QuizSchedule>();
             WordleGames = new HashSet<WordleGame>();
-            English = "";
-            Turkish = "";
+            English = string.Empty;
+            Turkish = string.Empty;
             Difficulty = 1;
         }
     }

@@ -1,1 +1,51 @@
- 
+@model WordRace000.Models.Word
+
+@{
+    ViewData["Title"] = "Kelime Sil";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h3 class="text-center mb-0">Kelimeyi Sil</h3>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Bu kelimeyi silmek istediğinizden emin misiniz?
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">İngilizce:</label>
+                        <div class="form-control-plaintext">@Model.English</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Türkçe:</label>
+                        <div class="form-control-plaintext">@Model.Turkish</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Kategori:</label>
+                <div class="form-control-plaintext">@Model.Category?.CategoryName</div>
+            </div>
+
+            <form asp-action="Delete" class="text-center">
+                <input type="hidden" asp-for="Id" />
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash me-2"></i>
+                    Sil
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    Geri Dön
+                </a>
+            </form>
+        </div>
+    </div>
+</div> 

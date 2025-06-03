@@ -1,0 +1,304 @@
+@model WordRace000.Models.WordleViewModel
+@{
+    ViewData["Title"] = "Wordle Oyna";
+}
+
+<style>
+    .wordle-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .wordle-board {
+        display: grid;
+        grid-template-rows: repeat(6, 1fr);
+        gap: 5px;
+        margin: 20px auto;
+        padding: 10px;
+        background-color: #f0f0f0;
+        border-radius: 10px;
+        width: fit-content;
+    }
+
+    .wordle-row {
+        display: grid;
+        grid-template-columns: repeat(var(--word-length), 1fr);
+        gap: 5px;
+        justify-content: center;
+    }
+
+    .wordle-tile {
+        width: clamp(35px, 5vw, 55px);
+        height: clamp(35px, 5vw, 55px);
+        border: 2px solid #d3d6da;
+        background-color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: clamp(1rem, 3vw, 1.8rem);
+        font-weight: bold;
+        text-transform: uppercase;
+        border-radius: 4px;
+    }
+
+    .wordle-tile.correct {
+        background-color: #6aaa64;
+        color: white;
+    }
+
+    .wordle-tile.wrong-position {
+        background-color: #c9b458;
+        color: white;
+    }
+
+    .wordle-tile.wrong {
+        background-color: #787c7e;
+        color: white;
+    }
+
+    .game-info {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 20px auto;
+        text-align: center;
+        max-width: 600px;
+    }
+
+    .legend {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .legend-box {
+        width: 20px;
+        height: 20px;
+    }
+
+    .legend-box.correct {
+        background-color: #6aaa64;
+    }
+
+    .legend-box.wrong-position {
+        background-color: #c9b458;
+    }
+
+    .legend-box.wrong {
+        background-color: #787c7e;
+    }
+
+    .input-container {
+        display: flex;
+        gap: 10px;
+        margin: 20px auto;
+        max-width: 600px;
+    }
+
+    .input-container input {
+        flex: 1;
+        padding: 10px 15px;
+        font-size: 1.2rem;
+        text-transform: uppercase;
+        border: 2px solid #d3d6da;
+        border-radius: 4px;
+    }
+
+    .input-container button {
+        padding: 10px 25px;
+        font-size: 1.2rem;
+        background-color: #1a73e8;
+        border: none;
+        border-radius: 4px;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .input-container button:hover {
+        background-color: #1557b0;
+    }
+</style>
+
+<div class="wordle-container">
+    <div class="game-info">
+        <h4>Kategori: @Model.CategoryName</h4>
+        <p>Kelime Uzunluğu: @Model.WordLength harf</p>
+        <p>6 deneme hakkınız var!</p>
+    </div>
+
+    <div id="game-board" class="wordle-board">
+        @for (int i = 0; i < 6; i++)
+        {
+            <div class="wordle-row">
+                @for (int j = 0; j < Model.WordLength; j++)
+                {
+                    <div class="wordle-tile"></div>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="input-container">
+        <input type="text" id="guess-input" class="form-control" 
+               maxlength="@Model.WordLength" 
+               autocomplete="off"
+               placeholder="Tahmininizi yazın">
+        <button class="btn btn-primary" id="submit-guess">Tahmin Et</button>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-box correct"></div>
+            <span>Doğru harf, doğru konum</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-box wrong-position"></div>
+            <span>Doğru harf, yanlış konum</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-box wrong"></div>
+            <span>Harf kelimede yok</span>
+        </div>
+    </div>
+</div>
+
+<!-- Oyun Sonucu Modal -->
+<div class="modal fade" id="gameResultModal" tabindex="-1" aria-labelledby="gameResultModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="gameResultModalLabel">Oyun Bitti!</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="gameResultMessage">
+            </div>
+            <div class="modal-footer">
+                <a href="@Url.Action("Play", "Wordle")" class="btn btn-primary">Yeni Oyun</a>
+                <a href="@Url.Action("History", "Wordle")" class="btn btn-secondary">Tamam</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const WORD_LENGTH = @Model.WordLength;
+            const MAX_GUESSES = 6;
+            let currentRow = 0;
+            let gameOver = false;
+            const targetWord = "@Model.TargetWord";
+            const gameId = @Model.GameId;
+
+            // CSS değişkenini ayarla
+            document.documentElement.style.setProperty('--word-length', WORD_LENGTH);
+
+            const gameBoard = document.getElementById('game-board');
+            const guessInput = document.getElementById('guess-input');
+            const submitButton = document.getElementById('submit-guess');
+            const gameResultModal = new bootstrap.Modal(document.getElementById('gameResultModal'));
+
+            // Input alanının maksimum uzunluğunu ayarla
+            guessInput.maxLength = WORD_LENGTH;
+
+            guessInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !gameOver) {
+                    submitGuess();
+                }
+            });
+
+            submitButton.addEventListener('click', function() {
+                if (!gameOver) {
+                    submitGuess();
+                }
+            });
+
+            function showGameResult(message) {
+                document.getElementById('gameResultMessage').innerHTML = message;
+                gameResultModal.show();
+            }
+
+            async function submitGuess() {
+                const guess = guessInput.value.trim().toUpperCase();
+                
+                if (guess.length !== WORD_LENGTH) {
+                    alert(`Lütfen ${WORD_LENGTH} harfli bir kelime girin!`);
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/Wordle/CheckWord', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            guess: guess,
+                            targetWord: targetWord,
+                            gameId: gameId
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.error) {
+                        alert(data.error);
+                        guessInput.value = '';
+                        return;
+                    }
+
+                    const row = gameBoard.children[currentRow];
+                    for (let i = 0; i < guess.length; i++) {
+                        const tile = row.children[i];
+                        tile.textContent = guess[i];
+                        tile.classList.add(data.feedback[i]);
+                    }
+
+                    if (guess === targetWord) {
+                        gameOver = true;
+                        const attempts = currentRow + 1;
+                        showGameResult(`
+                            <p>Tebrikler! Kelimeyi ${attempts} denemede buldunuz!</p>
+                            <p>Doğru kelime: ${targetWord}</p>
+                        `);
+                    } else if (currentRow === MAX_GUESSES - 1) {
+                        gameOver = true;
+                        showGameResult(`
+                            <p>Üzgünüm, kelimeyi bulamadınız.</p>
+                            <p>Doğru kelime: ${targetWord}</p>
+                        `);
+                    } else {
+                        currentRow++;
+                        guessInput.value = '';
+                    }
+                } catch (error) {
+                    console.error('Hata:', error);
+                    alert('Bir hata oluştu!');
+                }
+            }
+
+            // Sadece harf girişine izin ver ve uzunluk kontrolü
+            guessInput.addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^A-Za-z]/g, '').toUpperCase();
+                if (this.value.length > WORD_LENGTH) {
+                    this.value = this.value.slice(0, WORD_LENGTH);
+                }
+            });
+
+            // Oyun başladığında input'a odaklan
+            guessInput.focus();
+        });
+    </script>
+} 

@@ -1,0 +1,45 @@
+@{
+    ViewData["Title"] = "Wordle";
+}
+
+<div class="container mt-5">
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger mb-4">
+            @TempData["Error"]
+        </div>
+    }
+
+    <h1 class="text-center mb-4">Wordle Oyunu</h1>
+    <div class="text-center">
+        <p class="lead">
+            Wordle, kelime tahmin etme oyunudur. Seçilen kategorideki kelimeyi 6 denemede
+            bulmanız gerekiyor. Her tahmininizden sonra, harflerin doğru yerde olup olmadığını 
+            gösteren renkli ipuçları alırsınız:
+        </p>
+        <div class="d-flex justify-content-center gap-4 mb-4">
+            <div class="d-flex align-items-center">
+                <div class="bg-success text-white p-2 me-2" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">A</div>
+                <span>Doğru harf, doğru konum</span>
+            </div>
+            <div class="d-flex align-items-center">
+                <div class="bg-warning text-white p-2 me-2" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">B</div>
+                <span>Doğru harf, yanlış konum</span>
+            </div>
+            <div class="d-flex align-items-center">
+                <div class="bg-secondary text-white p-2 me-2" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">C</div>
+                <span>Harf kelimede yok</span>
+            </div>
+        </div>
+        <div class="mb-4">
+            <h4>Nasıl Oynanır?</h4>
+            <ul class="list-unstyled">
+                <li>1. Her tahmin geçerli bir kelime olmalıdır</li>
+                <li>2. Harflerin rengi, tahminizin ne kadar doğru olduğunu gösterir</li>
+                <li>3. Yeni bir oyun her seferinde farklı bir kelime ile başlar</li>
+                <li>4. Kelimeler farklı kategorilerden seçilir</li>
+            </ul>
+        </div>
+        <a href="@Url.Action("History", "Wordle")" class="btn btn-primary btn-lg">Oynamaya Başla</a>
+    </div>
+</div>

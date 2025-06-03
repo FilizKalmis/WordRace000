@@ -8,10 +8,7 @@ namespace WordRace000.Models
         public int WordId { get; set; }
         public int WordSampleId { get; set; }
 
-        [ForeignKey("WordId")]
-        public virtual Word? Word { get; set; }
-
-        [ForeignKey("WordSampleId")]
-        public virtual WordSample? WordSample { get; set; }
+        public virtual Word Word { get; set; }
+        public virtual WordSample WordSample { get; set; }
     }
 }

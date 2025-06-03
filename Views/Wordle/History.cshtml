@@ -1,0 +1,98 @@
+@model List<WordRace000.Models.WordleHistoryViewModel>
+@{
+    ViewData["Title"] = "Oyun Geçmişi";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Wordle Oyun Geçmişi</h2>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="text-end mb-3">
+                <a href="@Url.Action("Play", "Wordle")" class="btn btn-primary">Yeni Oyun</a>
+            </div>
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info">
+                    Henüz tamamlanmış oyun bulunmuyor.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Kategori</th>
+                                <th>Kelime</th>
+                                <th>Deneme Sayısı</th>
+                                <th>Sonuç</th>
+                                <th>Tamamlanma Tarihi</th>
+                                <th>Tahminler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var game in Model)
+                            {
+                                <tr>
+                                    <td>@game.CategoryName</td>
+                                    <td>@game.Word</td>
+                                    <td>@game.AttemptCount</td>
+                                    <td>
+                                        @if (game.IsSuccessful)
+                                        {
+                                            <span class="badge bg-success">Başarılı</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">Başarısız</span>
+                                        }
+                                    </td>
+                                    <td>@game.CompletedAt?.ToString("dd.MM.yyyy HH:mm")</td>
+                                    <td>
+                                        <small class="text-muted">
+                                            @string.Join(", ", game.Guesses)
+                                        </small>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h5 class="card-title">İstatistikler</h5>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <h6>Toplam Oyun</h6>
+                                    <p class="h4">@Model.Count()</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <h6>Başarılı Oyun</h6>
+                                    <p class="h4">@Model.Count(g => g.IsSuccessful)</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <h6>Başarı Oranı</h6>
+                                    <p class="h4">%@(Math.Round((double)Model.Count(g => g.IsSuccessful) / Model.Count() * 100))</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <h6>Ortalama Deneme</h6>
+                                    <p class="h4">@(Model.Any(g => g.IsSuccessful) ? Math.Round(Model.Where(g => g.IsSuccessful).Average(g => g.AttemptCount), 1) : 0)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div> 

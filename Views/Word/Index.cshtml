@@ -21,17 +21,20 @@
                     <div class="card-body">
                         <h5 class="card-title">@word.English</h5>
                         <p class="card-text">@word.Turkish</p>
-                        <p class="card-text"><small class="text-muted">Kategori: @(word.Category?.CategoryName ?? "Belirtilmemiş")</small></p>
+                        <p class="card-text">
+                            <small class="text-muted">Kategori: @(word.Category?.CategoryName ?? "Belirtilmemiş")</small>
+                        </p>
                     </div>
-                    <div class="card-footer">
-                        <div class="btn-group" role="group">
-                            <a asp-action="Edit" asp-route-id="@word.Id" class="btn btn-outline-primary">
+                    <div class="card-footer bg-transparent">
+                        <div class="d-flex justify-content-between gap-2">
+                            <a asp-action="Edit" asp-route-id="@word.Id" 
+                               class="btn btn-outline-primary flex-grow-1" 
+                               title="Düzenle">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <a asp-action="Details" asp-route-id="@word.Id" class="btn btn-outline-info">
-                                <i class="fas fa-info-circle"></i>
-                            </a>
-                            <a asp-action="Delete" asp-route-id="@word.Id" class="btn btn-outline-danger">
+                            <a asp-action="Delete" asp-route-id="@word.Id" 
+                               class="btn btn-outline-danger delete-btn flex-grow-1"
+                               title="Sil">
                                 <i class="fas fa-trash"></i>
                             </a>
                         </div>
@@ -51,6 +54,15 @@
                     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
                 });
             });
+
+            $('.delete-btn').hover(
+                function() {
+                    $(this).removeClass('btn-outline-danger').addClass('btn-danger text-white');
+                },
+                function() {
+                    $(this).removeClass('btn-danger text-white').addClass('btn-outline-danger');
+                }
+            );
         });
     </script>
 } 
