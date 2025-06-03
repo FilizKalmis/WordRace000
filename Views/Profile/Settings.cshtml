@@ -1,0 +1,54 @@
+@model WordRace000.Models.Settings
+
+@{
+    ViewData["Title"] = "Ayarlar";
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Uygulama Ayarları</h4>
+                    <form asp-action="Settings" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="UserId" />
+
+                        <div class="mb-3">
+                            <label asp-for="DailyWordCount" class="form-label">Günlük Hedef Kelime Sayısı</label>
+                            <input asp-for="DailyWordCount" type="number" min="5" max="50" class="form-control" />
+                            <span asp-validation-for="DailyWordCount" class="text-danger"></span>
+                            <small class="form-text text-muted">Her gün kaç yeni kelime öğrenmek istediğinizi belirleyin (5-50 arası)</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input asp-for="EmailNotifications" class="form-check-input" type="checkbox" />
+                                <label asp-for="EmailNotifications" class="form-check-label">E-posta Bildirimleri</label>
+                            </div>
+                            <small class="form-text text-muted">Günlük hatırlatmalar ve öğrenme istatistikleri için e-posta almak istiyorsanız aktif edin</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input asp-for="DarkMode" class="form-check-input" type="checkbox" />
+                                <label asp-for="DarkMode" class="form-check-label">Karanlık Mod</label>
+                            </div>
+                            <small class="form-text text-muted">Uygulamayı karanlık temada kullanmak için aktif edin</small>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">İptal</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

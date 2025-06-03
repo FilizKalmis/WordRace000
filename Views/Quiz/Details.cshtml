@@ -1,0 +1,83 @@
+@model WordRace000.Models.Quiz
+
+@{
+    ViewData["Title"] = "Quiz Sonuçları";
+}
+
+<div class="container mt-4" id="printArea">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="text-center">Quiz #@Model.Id Sonuçları</h3>
+        </div>
+        <div class="card-body">
+            <div class="text-center mb-4">
+                <h4>Toplam Puan: @Model.Score</h4>
+                <p class="text-muted">
+                    Doğru: @Model.QuizDetails.Count(qd => qd.IsCorrect) / 
+                    Toplam: @Model.QuizDetails.Count
+                </p>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>İngilizce</th>
+                            <th>Türkçe</th>
+                            <th>Sonuç</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var detail in Model.QuizDetails)
+                        {
+                            <tr>
+                                <td>@detail.Word.English</td>
+                                <td>@detail.Word.Turkish</td>
+                                <td>
+                                    @if (detail.IsCorrect)
+                                    {
+                                        <span class="badge bg-success">Doğru</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Yanlış</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="text-center mt-4">
+                <button onclick="window.print()" class="btn btn-info me-2">
+                    <i class="fas fa-print me-2"></i>
+                    Yazdır
+                </button>
+                <a asp-action="Create" class="btn btn-primary me-2">
+                    Yeni Quiz Başlat
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    Quiz Listesine Dön
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style type="text/css" media="print">
+        @@media print {
+            .btn { display: none !important; }
+            .card { border: none !important; }
+            .badge-success { 
+                border: 1px solid #28a745;
+                color: #28a745 !important;
+            }
+            .badge-danger { 
+                border: 1px solid #dc3545;
+                color: #dc3545 !important;
+            }
+        }
+    </style>
+}

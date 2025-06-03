@@ -1,0 +1,176 @@
+@model WordRace000.Models.User
+
+@{
+    ViewData["Title"] = "Profili Düzenle";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">@ViewData["Title"]</h2>
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="Password" />
+
+                        <div class="mb-3">
+                            <label asp-for="Username" class="form-label">Kullanıcı Adı</label>
+                            <input asp-for="Username" class="form-control" />
+                            <span asp-validation-for="Username" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">E-posta</label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Profil Fotoğrafı</label>
+                            <div class="row align-items-center">
+                                <div class="col-md-4 text-center mb-3">
+                                    <img id="profilePreview" src="@(string.IsNullOrEmpty(Model.ProfilePicture) ? "/images/default-avatar.png" : Model.ProfilePicture)" 
+                                         class="img-fluid rounded-circle" style="width: 150px; height: 150px; object-fit: cover;" />
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="mb-2">
+                                        <label class="form-label">URL ile ekle</label>
+                                        <input asp-for="ProfilePicture" class="form-control" id="profileUrlInput" 
+                                               placeholder="https://..." />
+                                        <span asp-validation-for="ProfilePicture" class="text-danger"></span>
+                                    </div>
+                                    <div>
+                                        <label class="form-label">veya Dosya Yükle</label>
+                                        <input type="file" class="form-control" id="profileFileInput" 
+                                               accept="image/*" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                                Şifre Değiştir
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">İptal</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Şifre Değiştirme Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Şifre Değiştir</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="ChangePassword" id="changePasswordForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="currentPassword" class="form-label">Mevcut Şifre</label>
+                        <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">Yeni Şifre</label>
+                        <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">Yeni Şifre (Tekrar)</label>
+                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">Şifreyi Değiştir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function () {
+            // Şifre değiştirme formu
+            $('#changePasswordForm').on('submit', function (e) {
+                e.preventDefault();
+                
+                if ($('#newPassword').val() !== $('#confirmPassword').val()) {
+                    alert('Yeni şifreler eşleşmiyor!');
+                    return;
+                }
+
+                $.ajax({
+                    url: '@Url.Action("ChangePassword", "Profile")',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function (result) {
+                        if (result.success) {
+                            alert('Şifreniz başarıyla değiştirildi!');
+                            $('#changePasswordModal').modal('hide');
+                        } else {
+                            alert(result.message || 'Şifre değiştirme işlemi başarısız!');
+                        }
+                    },
+                    error: function () {
+                        alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                    }
+                });
+            });
+
+            // Profil fotoğrafı URL önizleme
+            $('#profileUrlInput').on('change', function() {
+                var url = $(this).val();
+                if (url) {
+                    $('#profilePreview').attr('src', url);
+                }
+            });
+
+            // Profil fotoğrafı dosya yükleme
+            $('#profileFileInput').on('change', function() {
+                var file = this.files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#profilePreview').attr('src', e.target.result);
+                        // Dosyayı yükle ve URL'yi al
+                        uploadProfileImage(file);
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            function uploadProfileImage(file) {
+                var formData = new FormData();
+                formData.append('file', file);
+
+                $.ajax({
+                    url: '@Url.Action("UploadProfileImage", "Profile")',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(result) {
+                        if (result.success) {
+                            $('#profileUrlInput').val(result.url);
+                        } else {
+                            alert('Dosya yükleme başarısız: ' + result.message);
+                        }
+                    },
+                    error: function() {
+                        alert('Dosya yükleme sırasında bir hata oluştu.');
+                    }
+                });
+            }
+        });
+    </script>
+} 

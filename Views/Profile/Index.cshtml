@@ -1,0 +1,83 @@
+@model WordRace000.Models.ProfileViewModel
+
+@{
+    ViewData["Title"] = "Profil";
+}
+
+<div class="container py-5">
+    <div class="row">
+        <!-- Profil Bilgileri -->
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <img src="@(string.IsNullOrEmpty(Model.User.ProfilePicture) ? "/images/default-avatar.png" : Model.User.ProfilePicture)"
+                         alt="avatar" class="rounded-circle img-fluid" style="width: 150px;">
+                    <h5 class="my-3">@Model.User.FullName</h5>
+                    <p class="text-muted mb-1">@Model.User.Email</p>
+                    <div class="d-flex justify-content-center mb-2">
+                        <a asp-action="Edit" class="btn btn-primary">Profili Düzenle</a>
+                        <a asp-action="Settings" class="btn btn-outline-primary ms-1">Ayarlar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- İstatistikler -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Öğrenme İstatistikleri</h5>
+                    <div class="row">
+                        <div class="col-sm-4 text-center mb-3">
+                            <h6>Toplam Kelime</h6>
+                            <p class="text-muted mb-0">@Model.TotalWords</p>
+                        </div>
+                        <div class="col-sm-4 text-center mb-3">
+                            <h6>Öğrenilen</h6>
+                            <p class="text-muted mb-0">@Model.LearnedWords</p>
+                        </div>
+                        <div class="col-sm-4 text-center mb-3">
+                            <h6>Öğrenme Aşamasında</h6>
+                            <p class="text-muted mb-0">@Model.InProgressWords</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-6 text-center">
+                            <h6>Toplam Quiz</h6>
+                            <p class="text-muted mb-0">@Model.TotalQuizzes</p>
+                        </div>
+                        <div class="col-sm-6 text-center">
+                            <h6>Son Quiz Tarihi</h6>
+                            <p class="text-muted mb-0">
+                                @(Model.LastQuizDate.HasValue ? Model.LastQuizDate.Value.ToString("dd.MM.yyyy") : "Henüz quiz yapılmadı")
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kategori İlerlemesi -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Kategori Bazında İlerleme</h5>
+                    @foreach (var category in Model.CategoryProgress)
+                    {
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>@category.CategoryName</span>
+                                <span>@category.LearnedWords / @category.TotalWords</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: @(category.ProgressPercentage)%"
+                                     aria-valuenow="@category.ProgressPercentage" aria-valuemin="0" aria-valuemax="100">
+                                    @(category.ProgressPercentage)%
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
