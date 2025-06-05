@@ -2,16 +2,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WordRace000.Models
 {
+    [Table("QuizSchedule")]
     public class QuizSchedule
     {
         public int Id { get; set; }
         public int UserId { get; set; }
         public int WordId { get; set; }
         public DateTime NextTestDate { get; set; }
-        public int AttemptCount { get; set; }
-        public bool IsCompleted { get; set; }
-        public DateTime CreateAt { get; set; }
-        public DateTime LastUpdateAt { get; set; }
+        public int? AttemptCount { get; set; }
+        public bool? IsCompleted { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? LastUpdatedAt { get; set; }
 
         [ForeignKey("UserId")]
         public virtual User? User { get; set; }
@@ -21,8 +22,8 @@ namespace WordRace000.Models
 
         public QuizSchedule()
         {
-            CreateAt = DateTime.UtcNow;
-            LastUpdateAt = DateTime.UtcNow;
+            CreatedAt = DateTime.UtcNow;
+            LastUpdatedAt = DateTime.UtcNow;
             AttemptCount = 0;
             IsCompleted = false;
         }

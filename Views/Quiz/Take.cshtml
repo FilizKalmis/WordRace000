@@ -1,31 +1,98 @@
 @model WordRace000.Models.QuizDetail
+@inject WordRace000.Data.ApplicationDbContext _context
+@using Microsoft.EntityFrameworkCore
 
 @{
     ViewData["Title"] = "Quiz";
+    
+    // Tüm örnek cümleleri al ve rastgele birini seç
+    var sampleSentences = await _context.WordSampleWords
+        .Include(wsw => wsw.WordSample)
+        .Where(wsw => wsw.WordId == Model.WordId)
+        .Select(wsw => wsw.WordSample.SampleText)
+        .ToListAsync();
+
+    string sampleSentence;
+    if (sampleSentences.Any())
+    {
+        Random rnd = new Random();
+        sampleSentence = sampleSentences[rnd.Next(sampleSentences.Count)];
+    }
+    else
+    {
+        // Eğer örnek cümle yoksa, kelimeyi kullanarak basit bir cümle oluştur
+        sampleSentence = $"This is an example sentence with the word '{Model.Word.English}'.";
+    }
 }
 
 <div class="container mt-4">
     <div class="card">
         <div class="card-header">
-            <h3 class="text-center">Quiz #@Model.QuizId</h3>
+            <h2 class="text-center mb-0">Quiz #@Model.QuizId</h2>
         </div>
         <div class="card-body">
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @if (TempData["DebugInfo"] != null)
+            {
+                <div class="alert alert-info">
+                    <pre>@TempData["DebugInfo"]</pre>
+                </div>
+            }
+
             <div class="text-center mb-4">
-                <h4>@Model.Word.English</h4>
-                <p class="text-muted">Bu kelimenin Türkçe karşılığını yazın</p>
+                <h3 class="display-4">@Model.Word.English</h3>
+                <p class="text-muted mb-4">Bu kelimenin Türkçe karşılığını yazın</p>
+
+                <!-- Bilgilendirme mesajı -->
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Kelimeyi bilmiyorsanız "Sonraki Soru" butonuyla atlayabilirsiniz. Atlanan sorular yanlış olarak sayılacaktır.
+                </div>
+
+                @* Debug bilgisi *@
+                @if (TempData["DebugInfo"] != null)
+                {
+                    <div class="alert alert-info mb-4">
+                        <pre style="margin: 0;">@TempData["DebugInfo"]</pre>
+                    </div>
+                }
+
+                @* Örnek cümle *@
+                <div class="alert alert-info mb-4">
+                    <h5 class="mb-2">Örnek Cümle:</h5>
+                    <p class="mb-0">@sampleSentence</p>
+                </div>
             </div>
 
-            <form asp-controller="Quiz" asp-action="Answer" method="post" class="mt-4">
+            <form asp-action="Answer" method="post" class="mb-4">
                 <input type="hidden" name="quizDetailId" value="@Model.Id" />
                 
                 <div class="form-group">
                     <input type="text" name="answer" class="form-control form-control-lg text-center" 
-                           required autofocus autocomplete="off" />
+                           placeholder="Türkçe karşılığı..." autofocus autocomplete="off">
                 </div>
 
-                <div class="text-center mt-4">
-                    <button type="submit" class="btn btn-primary btn-lg">
-                        Cevapla
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg" onclick="return validateAnswer();">
+                        <i class="fas fa-check me-2"></i>Cevapla
+                    </button>
+                    
+                    <!-- Sonraki Soru Butonu -->
+                    <button type="submit" name="moveNext" value="true" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-forward me-2"></i>Sonraki Soru
                     </button>
                 </div>
             </form>
@@ -34,13 +101,20 @@
 </div>
 
 @section Scripts {
-    <script>
-        // Enter tuşu ile formu gönder
-        document.querySelector('input[name="answer"]').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                document.querySelector('form').submit();
+   <script>
+        // Sayfa yüklendiğinde input'a odaklan
+        window.onload = function() {
+            document.querySelector('input[name="answer"]').focus();
+        };
+
+        // Cevapla butonu için validasyon
+        function validateAnswer() {
+            var answer = document.querySelector('input[name="answer"]').value.trim();
+            if (answer === '') {
+                alert('Lütfen bir cevap girin veya Sonraki Soru butonunu kullanın.');
+                return false;
             }
-        });
+            return true;
+        }
     </script>
 }
