@@ -1,0 +1,109 @@
+@model IEnumerable<dynamic>
+
+@{
+    ViewData["Title"] = "Örnek Cümlesi Olmayan Kelimeler";
+}
+
+<div class="container mt-4">
+    <h2>Örnek Cümlesi Olmayan Kelimeler</h2>
+    <p class="text-muted">Aşağıdaki kelimeler için örnek cümle ekleyebilirsiniz.</p>
+
+    <div class="row">
+        <div class="col-md-8">
+            @foreach (var group in Model)
+            {
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>@group.Category</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>İngilizce</th>
+                                        <th>Türkçe</th>
+                                        <th>Örnek Cümle</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var word in group.Words)
+                                    {
+                                        <tr data-word-id="@word.Id">
+                                            <td>@word.English</td>
+                                            <td>@word.Turkish</td>
+                                            <td>
+                                                <input type="text" class="form-control sentence-input" 
+                                                       placeholder="Enter an example sentence..."
+                                                       value="This is an example sentence with the word '@word.English'." />
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary save-sentence">Kaydet</button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Hızlı Ekle</h4>
+                </div>
+                <div class="card-body">
+                    <button id="saveAllButton" class="btn btn-success">Tüm Örnek Cümleleri Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Tek bir cümle kaydetme
+            $('.save-sentence').click(function() {
+                const row = $(this).closest('tr');
+                const wordId = row.data('word-id');
+                const sentence = row.find('.sentence-input').val();
+                
+                saveSentence([{ wordId: wordId, sampleText: sentence }]);
+            });
+
+            // Tüm cümleleri kaydetme
+            $('#saveAllButton').click(function() {
+                const sentences = [];
+                $('tr[data-word-id]').each(function() {
+                    const wordId = $(this).data('word-id');
+                    const sentence = $(this).find('.sentence-input').val();
+                    sentences.push({ wordId: wordId, sampleText: sentence });
+                });
+
+                saveSentence(sentences);
+            });
+
+            function saveSentence(sentences) {
+                $.ajax({
+                    url: '@Url.Action("AddSampleSentences", "Quiz")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(sentences),
+                    success: function(response) {
+                        if (response.success) {
+                            alert('Örnek cümleler başarıyla kaydedildi!');
+                            location.reload();
+                        }
+                    },
+                    error: function() {
+                        alert('Bir hata oluştu!');
+                    }
+                });
+            }
+        });
+    </script>
+} 
