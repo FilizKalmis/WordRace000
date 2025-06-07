@@ -1,73 +1,45 @@
 ﻿@{
-    ViewData["Title"] = "WordRace - Kelime Öğrenme Uygulaması";
+    ViewData["Title"] = "Ana Sayfa";
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8 text-center">
-            <h1 class="display-4 mb-4">WordRace'e Hoş Geldiniz!</h1>
-            <p class="lead mb-5">
-                Eğlenceli ve etkili bir şekilde yeni kelimeler öğrenin. 
-                6 aşamalı öğrenme algoritması ile kalıcı öğrenme sağlayın.
-            </p>
-        </div>
-    </div>
+<div class="text-center">
+    <h1 class="display-4">WordRace'e Hoş Geldiniz!</h1>
+    <p>Eğlenceli ve etkili bir şekilde yeni kelimeler öğrenin. 6 aşamalı öğrenme algoritması ile kalıcı öğrenme sağlayın.</p>
+</div>
 
-    <div class="row justify-content-center mb-5">
-        <div class="col-md-8">
-            <div class="card shadow-sm">
-                <div class="card-body text-center">
-                    <h3 class="card-title mb-4">Başlamak için:</h3>
-                    <div class="d-grid gap-3">
-                        <a href="/Account/Login" class="btn btn-primary btn-lg">
-                            <i class="fas fa-sign-in-alt me-2"></i>Giriş Yap
-                        </a>
-                        <a href="/Account/Register" class="btn btn-success btn-lg">
-                            <i class="fas fa-user-plus me-2"></i>Kayıt Ol
-                        </a>
-                    </div>
-                </div>
+<div class="row justify-content-center">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-book fa-3x mb-3 text-primary"></i>
+                <h3>300+ Kelime</h3>
+                <p>Özenle seçilmiş kelime havuzu</p>
+                <a asp-controller="Words" asp-action="Index" class="btn btn-primary">Kelimelere Göz At</a>
             </div>
         </div>
     </div>
 
-    <div class="row justify-content-center">
-        <div class="col-md-4">
-            <div class="card shadow-sm mb-4">
-                <div class="card-body text-center">
-                    <i class="fas fa-book fa-3x text-primary mb-3"></i>
-                    <h4>300+ Kelime</h4>
-                    <p>Özenle seçilmiş kelime havuzu</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm mb-4">
-                <div class="card-body text-center">
-                    <i class="fas fa-graduation-cap fa-3x text-success mb-3"></i>
-                    <h4>Akıllı Öğrenme</h4>
-                    <p>6 aşamalı öğrenme sistemi</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm mb-4">
-                <div class="card-body text-center">
-                    <i class="fas fa-gamepad fa-3x text-info mb-3"></i>
-                    <h4>Eğlenceli Oyunlar</h4>
-                    <p>Wordle ve Word Chain</p>
-                </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-graduation-cap fa-3x mb-3 text-success"></i>
+                <h3>Akıllı Öğrenme</h3>
+                <p>6 aşamalı öğrenme sistemi</p>
+                <a asp-controller="Quiz" asp-action="Start" class="btn btn-success">Quiz'e Başla</a>
             </div>
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">Eğlenceli Oyunlar</h5>
-            <h6 class="card-subtitle mb-2 text-muted">Wordle ve Word Chain</h6>
-            <div class="d-flex justify-content-around">
-                <a href="@Url.Action("Index", "Wordle")" class="btn btn-info">Wordle</a>
-                <a href="@Url.Action("Index", "WordChain")" class="btn btn-info">Word Chain</a>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-gamepad fa-3x mb-3 text-info"></i>
+                <h3>Eğlenceli Oyunlar</h3>
+                <p>Wordle ve Word Chain</p>
+                <div class="btn-group">
+                    <a asp-controller="Games" asp-action="Wordle" class="btn btn-info">Wordle</a>
+                    <a asp-controller="Games" asp-action="WordChain" class="btn btn-info">Word Chain</a>
+                </div>
             </div>
         </div>
     </div>

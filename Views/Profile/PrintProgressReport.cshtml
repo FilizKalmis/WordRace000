@@ -1,0 +1,150 @@
+@model WordRace000.Models.CategoryProgressReport
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>İlerleme Raporu - @DateTime.Now.ToString("dd/MM/yyyy")</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            color: #333;
+        }
+        .report-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .report-title {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .report-meta {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .progress-bar {
+            background-color: #f0f0f0;
+            height: 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #4CAF50;
+            position: absolute;
+            left: 0;
+            top: 0;
+            transition: width 0.3s ease;
+        }
+        .progress-text {
+            position: relative;
+            z-index: 1;
+            color: #000;
+            text-align: center;
+            line-height: 20px;
+            width: 100%;
+            font-size: 12px;
+        }
+        .category-item {
+            margin-bottom: 20px;
+        }
+        .overall-progress {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+        }
+        .progress-column {
+            width: 40%;
+        }
+        @@media print {
+            body {
+                margin: 0;
+                padding: 20px;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="report-header">
+        <h1 class="report-title">WordRace İlerleme Raporu</h1>
+        <div class="report-meta">
+            <p>Kullanıcı: @(Model.User?.Username ?? "Bilinmiyor")</p>
+            <p>Rapor Tarihi: @Model.GeneratedAt.ToString("dd/MM/yyyy HH:mm")</p>
+        </div>
+    </div>
+
+    <div class="overall-progress">
+        <h2>Genel İlerleme</h2>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: @(Model.OverallProgress)%"></div>
+            <div class="progress-text">%@Model.OverallProgress.ToString("F1")</div>
+        </div>
+        <p>Öğrenilen Kelimeler: @Model.TotalLearnedWords / @Model.TotalWords</p>
+    </div>
+
+    <h2>Kategori Bazında İlerleme</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Kategori</th>
+                <th>Toplam Kelime</th>
+                <th>Öğrenilen</th>
+                <th class="progress-column">İlerleme</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Details != null)
+            {
+                @foreach (var detail in Model.Details.OrderByDescending(d => d.ProgressPercentage))
+                {
+                    <tr>
+                        <td>@detail.CategoryName</td>
+                        <td>@detail.TotalWords</td>
+                        <td>@detail.LearnedWords</td>
+                        <td class="progress-column">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: @(detail.ProgressPercentage)%"></div>
+                                <div class="progress-text">%@detail.ProgressPercentage.ToString("F1")</div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+    <div class="no-print" style="text-align: center; margin-top: 30px;">
+        <button onclick="window.print()" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">
+            Yazdır
+        </button>
+        <a href="@Url.Action("Index")" style="margin-left: 10px; padding: 10px 20px; text-decoration: none; color: #666;">
+            Geri Dön
+        </a>
+    </div>
+</body>
+</html> 

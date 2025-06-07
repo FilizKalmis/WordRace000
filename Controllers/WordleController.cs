@@ -73,7 +73,7 @@ namespace WordRace000.Controllers
                 // Veritabanında kelime yoksa kullanıcıyı bilgilendir
                 if (!_context.Words.Any())
                 {
-                    TempData["Error"] = "Veritabanında kelime bulunamadı. Lütfen sistem yöneticisi ile iletişime geçin.";
+                    TempData["Error"] = "Veritabanında kelime bulunamadı.";
                     return RedirectToAction("Index");
                 }
 

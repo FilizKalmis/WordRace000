@@ -26,6 +26,8 @@ namespace WordRace000.Data
         public DbSet<WordleGame> WordleGame { get; set; }
         public DbSet<WordChainStory> WordChainStories { get; set; }
         public DbSet<ExamResult> ExamResults { get; set; }
+        public DbSet<CategoryProgressReport> CategoryProgressReports { get; set; }
+        public DbSet<CategoryProgressDetail> CategoryProgressDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -12,10 +12,10 @@ namespace WordRace000.Models
         public DateTime ExamDate { get; set; }
 
         [ForeignKey("UserId")]
-        public virtual User User { get; set; }
+        public virtual User? User { get; set; }
 
         [ForeignKey("CategoryId")]
-        public virtual Category Category { get; set; }
+        public virtual Category? Category { get; set; }
 
         public ExamResult()
         {

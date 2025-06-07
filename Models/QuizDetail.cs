@@ -8,6 +8,7 @@ namespace WordRace000.Models
         public int QuizId { get; set; }
         public int WordId { get; set; }
         public bool IsCorrect { get; set; }
+        public bool IsAnswered { get; set; }
 
         [ForeignKey("QuizId")]
         public virtual Quiz? Quiz { get; set; }

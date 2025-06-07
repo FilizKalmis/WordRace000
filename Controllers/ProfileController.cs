@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WordRace000.Data;
 using WordRace000.Models;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace WordRace000.Controllers
 {
@@ -10,10 +13,12 @@ namespace WordRace000.Controllers
     public class ProfileController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<ProfileController> _logger;
 
-        public ProfileController(ApplicationDbContext context)
+        public ProfileController(ApplicationDbContext context, ILogger<ProfileController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Profile
@@ -27,34 +32,32 @@ namespace WordRace000.Controllers
                 return NotFound();
             }
 
+            // Get total words count
             var totalWords = await _context.Words.CountAsync();
+
+            // Get learned words count
             var learnedWords = await _context.LearnedWords
                 .Where(lw => lw.UserId == userId)
                 .CountAsync();
 
-            var inProgressWords = await _context.WordProgresses
-                .Where(wp => wp.UserId == userId && !wp.IsLearned)
+            // Get in progress words count
+            var inProgressWords = await _context.QuizSchedules
+                .Where(qs => qs.UserId == userId && 
+                           (!qs.IsCompleted.HasValue || !qs.IsCompleted.Value))
                 .CountAsync();
 
+            // Get total quizzes and last quiz date
             var totalQuizzes = await _context.Quizzes
                 .Where(q => q.UserId == userId)
                 .CountAsync();
 
-            var lastQuiz = await _context.Quizzes
+            var lastQuizDate = await _context.Quizzes
                 .Where(q => q.UserId == userId)
                 .OrderByDescending(q => q.CreatedAt)
+                .Select(q => q.CreatedAt)
                 .FirstOrDefaultAsync();
 
-            var categoryProgress = await _context.Category
-                .Select(c => new CategoryProgressViewModel
-                {
-                    CategoryName = c.CategoryName,
-                    TotalWords = _context.Words.Count(w => w.CategoryId == c.Id),
-                    LearnedWords = _context.LearnedWords
-                        .Count(lw => lw.Word.CategoryId == c.Id && lw.UserId == userId)
-                })
-                .ToListAsync();
-
+            var categoryProgress = await GetCategoryProgress(userId);
             var viewModel = new ProfileViewModel
             {
                 User = user,
@@ -62,11 +65,86 @@ namespace WordRace000.Controllers
                 LearnedWords = learnedWords,
                 InProgressWords = inProgressWords,
                 TotalQuizzes = totalQuizzes,
-                LastQuizDate = lastQuiz?.CreatedAt,
+                LastQuizDate = lastQuizDate,
                 CategoryProgress = categoryProgress
             };
 
             return View(viewModel);
+        }
+
+        private async Task<List<CategoryProgressViewModel>> GetCategoryProgress(int userId)
+        {
+            return await _context.Category
+                .Select(c => new CategoryProgressViewModel
+                {
+                    CategoryName = c.CategoryName,
+                    TotalWords = _context.Words.Count(w => w.CategoryId == c.Id),
+                    LearnedWords = _context.LearnedWords
+                        .Count(lw => lw.Word.CategoryId == c.Id && lw.UserId == userId),
+                    LastUpdated = DateTime.UtcNow
+                })
+                .ToListAsync();
+        }
+
+        // POST: Profile/GenerateProgressReport
+        [HttpPost]
+        public async Task<IActionResult> GenerateProgressReport()
+        {
+            try
+            {
+                var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+                var progress = await GetCategoryProgress(userId);
+
+                var report = new CategoryProgressReport
+                {
+                    UserId = userId,
+                    GeneratedAt = DateTime.UtcNow,
+                    TotalLearnedWords = progress.Sum(p => p.LearnedWords),
+                    TotalWords = progress.Sum(p => p.TotalWords),
+                    OverallProgress = progress.Sum(p => p.LearnedWords) * 100.0M / progress.Sum(p => p.TotalWords)
+                };
+
+                _context.CategoryProgressReports.Add(report);
+                await _context.SaveChangesAsync();
+
+                var details = progress.Select(p => new CategoryProgressDetail
+                {
+                    ReportId = report.Id,
+                    CategoryName = p.CategoryName,
+                    TotalWords = p.TotalWords,
+                    LearnedWords = p.LearnedWords,
+                    ProgressPercentage = p.TotalWords > 0 ? (p.LearnedWords * 100.0M / p.TotalWords) : 0,
+                    LastUpdated = p.LastUpdated
+                }).ToList();
+
+                _context.CategoryProgressDetails.AddRange(details);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(PrintProgressReport), new { id = report.Id });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "İlerleme raporu oluşturulurken hata oluştu");
+                TempData["ErrorMessage"] = "Rapor oluşturulurken bir hata oluştu.";
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        // GET: Profile/PrintProgressReport/5
+        public async Task<IActionResult> PrintProgressReport(int id)
+        {
+            var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+            var report = await _context.CategoryProgressReports
+                .Include(r => r.Details)
+                .Include(r => r.User)
+                .FirstOrDefaultAsync(r => r.Id == id && r.UserId == userId);
+
+            if (report == null)
+            {
+                return NotFound();
+            }
+
+            return View(report);
         }
 
         // GET: Profile/Edit

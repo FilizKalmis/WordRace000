@@ -32,13 +32,35 @@ namespace WordRace000.Controllers
         public async Task<IActionResult> Create()
         {
             var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+            var today = DateTime.UtcNow.Date;
+            var yesterday = today.AddDays(-1);
             
+            // Dünkü quizde doğru bilinen kelimeleri al
+            var yesterdaysCorrectWords = await _context.QuizDetails
+                .Include(qd => qd.Quiz)
+                .Where(qd => qd.Quiz.UserId == userId && 
+                            qd.Quiz.CreatedAt.Date == yesterday &&
+                            qd.IsCorrect)
+                .Select(qd => qd.WordId)
+                .Distinct()
+                .ToListAsync();
+
+            // Bugün tekrar edilmesi gereken kelimeler (sadece dün doğru bilinenler)
+            var scheduledWords = await _context.QuizSchedules
+                .Where(qs => qs.UserId == userId && 
+                            qs.NextTestDate.Date <= today && 
+                            yesterdaysCorrectWords.Contains(qs.WordId) &&
+                            (!qs.IsCompleted.HasValue || !qs.IsCompleted.Value))
+                .Select(qs => qs.WordId)
+                .ToListAsync();
+
             // Kullanıcının ayarlarını al
             var settings = await _context.Settings
                 .FirstOrDefaultAsync(s => s.UserId == userId);
 
             // Eğer ayar yoksa varsayılan değer olarak 10 kullan
             ViewBag.DailyWordCount = settings?.DailyWordCount ?? 10;
+            ViewBag.ScheduledWordCount = scheduledWords.Count;
 
             return View(new Quiz());
         }
@@ -49,14 +71,45 @@ namespace WordRace000.Controllers
         public async Task<IActionResult> StartQuiz()
         {
             var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+            var today = DateTime.UtcNow.Date;
+            var yesterday = today.AddDays(-1);
             
-            // Kullanıcının ayarlarını al
+            // Dünkü quizde doğru bilinen kelimeleri al
+            var yesterdaysCorrectWords = await _context.QuizDetails
+                .Include(qd => qd.Quiz)
+                .Where(qd => qd.Quiz.UserId == userId && 
+                            qd.Quiz.CreatedAt.Date == yesterday &&
+                            qd.IsCorrect)
+                .Select(qd => qd.WordId)
+                .Distinct()
+                .ToListAsync();
+
+            // Bugün tekrar edilmesi gereken kelimeler (sadece dün doğru bilinenler)
+            var scheduledWords = await _context.QuizSchedules
+                .Where(qs => qs.UserId == userId && 
+                            qs.NextTestDate.Date <= today && 
+                            yesterdaysCorrectWords.Contains(qs.WordId) &&
+                            (!qs.IsCompleted.HasValue || !qs.IsCompleted.Value))
+                .Select(qs => qs.WordId)
+                .ToListAsync();
+
+            // Kullanıcı ayarlarından yeni kelime sayısını al
             var settings = await _context.Settings
                 .FirstOrDefaultAsync(s => s.UserId == userId);
+            int newWordCount = settings?.DailyWordCount ?? 10;
 
-            // Eğer ayar yoksa varsayılan değer olarak 10 kullan
-            int wordCount = settings?.DailyWordCount ?? 10;
-            
+            // Yeni kelimeler seç (hiç test edilmemiş veya schedule'da olmayan kelimelerden)
+            var newWords = await _context.Words
+                .Where(w => !_context.QuizSchedules
+                    .Any(qs => qs.WordId == w.Id && qs.UserId == userId))
+                .OrderBy(r => Guid.NewGuid())
+                .Take(newWordCount)
+                .Select(w => w.Id)
+                .ToListAsync();
+
+            // Tüm kelime ID'lerini birleştir
+            var allWordIds = scheduledWords.Concat(newWords).ToList();
+
             // Yeni quiz oluştur
             var quiz = new Quiz
             {
@@ -69,70 +122,33 @@ namespace WordRace000.Controllers
             _context.Quizzes.Add(quiz);
             await _context.SaveChangesAsync();
 
-            // Kullanıcının ayarlarındaki kelime sayısı kadar rastgele kelime seç
-            var words = await _context.Words
-                .OrderBy(r => Guid.NewGuid())
-                .Take(wordCount)
-                .ToListAsync();
-
             // Quiz detaylarını oluştur
-            foreach (var word in words)
+            foreach (var wordId in allWordIds)
             {
                 var quizDetail = new QuizDetail
                 {
                     QuizId = quiz.Id,
-                    WordId = word.Id,
-                    IsCorrect = false
+                    WordId = wordId,
+                    IsCorrect = false,
+                    IsAnswered = false
                 };
                 _context.QuizDetails.Add(quizDetail);
+            }
 
-                // Her kelime için örnek cümle kontrolü yap
-                var hasExampleSentence = await _context.WordSampleWords
-                    .AnyAsync(wsw => wsw.WordId == word.Id);
-
-                // Eğer kelimeye ait örnek cümle yoksa ekle
-                if (!hasExampleSentence)
+            // Yeni kelimeler için QuizSchedule kayıtları oluştur
+            foreach (var wordId in newWords)
+            {
+                var schedule = new QuizSchedule
                 {
-                    // Kelime için örnek cümle oluştur
-                    var sampleText = "";
-                    switch (word.English.ToLower())
-                    {
-                        case "pig":
-                            sampleText = "The pig is rolling in the mud.";
-                            break;
-                        case "bear":
-                            sampleText = "I saw a big brown bear in the forest.";
-                            break;
-                        case "lion":
-                            sampleText = "The lion is the king of the jungle.";
-                            break;
-                        case "dog":
-                            sampleText = "My dog loves to play fetch.";
-                            break;
-                        case "cat":
-                            sampleText = "The cat is sleeping on the windowsill.";
-                            break;
-                        default:
-                            sampleText = $"This is an example sentence with the word '{word.English}'.";
-                            break;
-                    }
-
-                    // Örnek cümleyi ekle
-                    var wordSample = new WordSample
-                    {
-                        SampleText = sampleText
-                    };
-                    _context.WordSample.Add(wordSample);
-                    await _context.SaveChangesAsync();
-
-                    // Kelime-cümle ilişkisini kur
-                    var wordSampleWord = new WordSampleWord
-                    {
-                        WordId = word.Id,
-                        WordSampleId = wordSample.Id
-                    };
-                    _context.WordSampleWords.Add(wordSampleWord);
-                }
+                    UserId = userId,
+                    WordId = wordId,
+                    NextTestDate = today.AddDays(1), // 1. aşama: 1 gün sonra
+                    AttemptCount = 0,
+                    IsCompleted = false,
+                    CreatedAt = today,
+                    LastUpdatedAt = today
+                };
+                _context.QuizSchedules.Add(schedule);
             }
 
             await _context.SaveChangesAsync();
@@ -156,7 +172,7 @@ namespace WordRace000.Controllers
 
             // Henüz cevaplanmamış ilk soruyu bul
             var currentQuestion = quiz.QuizDetails
-                .FirstOrDefault(qd => !qd.IsCorrect);
+                .FirstOrDefault(qd => !qd.IsAnswered);
 
             if (currentQuestion == null)
             {
@@ -167,87 +183,133 @@ namespace WordRace000.Controllers
                 return RedirectToAction(nameof(Details), new { id = quiz.Id });
             }
 
-            // Debug bilgisi için veritabanı durumunu kontrol edelim
-            var totalWordSamples = await _context.WordSample.CountAsync();
-            var totalWordSampleWords = await _context.WordSampleWords.CountAsync();
-            
-            // Kelimeye ait örnek cümleleri getir
-            var currentWordSampleWords = await _context.WordSampleWords
-                .Include(wsw => wsw.WordSample)
-                .Where(wsw => wsw.WordId == currentQuestion.WordId)
-                .ToListAsync();
-
-            var debugMessage = $"Veritabanı Durumu:\n" +
-                             $"- Toplam örnek cümle sayısı: {totalWordSamples}\n" +
-                             $"- Toplam kelime-cümle ilişkisi: {totalWordSampleWords}\n" +
-                             $"- Mevcut kelime (ID: {currentQuestion.WordId}, {currentQuestion.Word.English}) için:\n" +
-                             $"  * İlişkili cümle sayısı: {currentWordSampleWords.Count}\n";
-
-            if (currentWordSampleWords.Any())
-            {
-                debugMessage += "  * İlişkili cümleler:\n";
-                foreach (var wsw in currentWordSampleWords)
-                {
-                    debugMessage += $"    - ID: {wsw.WordSampleId}, Text: {wsw.WordSample?.SampleText ?? "NULL"}\n";
-                }
-            }
-
-            TempData["DebugInfo"] = debugMessage;
-
-            // Eğer örnek cümle varsa rastgele birini seç
-            if (currentWordSampleWords.Any())
-            {
-                var validSentences = currentWordSampleWords
-                    .Where(wsw => wsw.WordSample != null && !string.IsNullOrEmpty(wsw.WordSample.SampleText))
-                    .Select(wsw => wsw.WordSample.SampleText)
-                    .ToList();
-
-                if (validSentences.Any())
-                {
-                    Random rnd = new Random();
-                    ViewBag.SampleSentence = validSentences[rnd.Next(validSentences.Count)];
-                }
-            }
-
             return View(currentQuestion);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Answer(int quizDetailId, string answer)
+        public async Task<IActionResult> Answer(int quizDetailId, string answer, bool moveNext = false)
         {
             var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+            var today = DateTime.UtcNow.Date;
             
             var quizDetail = await _context.QuizDetails
                 .Include(qd => qd.Word)
                 .Include(qd => qd.Quiz)
                 .FirstOrDefaultAsync(qd => qd.Id == quizDetailId && qd.Quiz.UserId == userId);
 
-            if (quizDetail == null)
+            if (quizDetail == null || quizDetail.Word == null)
             {
                 return NotFound();
             }
 
-            // Cevabı kontrol et
-            bool isCorrect = answer.Trim().ToLower() == quizDetail.Word.Turkish.Trim().ToLower();
-            quizDetail.IsCorrect = isCorrect;
-
-            if (isCorrect)
+            if (!moveNext)  // Normal cevap verme durumu
             {
-                // Kelime ilerlemesini güncelle
+                // Cevabı kontrol et
+                bool isCorrect = !string.IsNullOrEmpty(answer) && 
+                               answer.Trim().ToLower() == quizDetail.Word.Turkish?.Trim().ToLower();
+                quizDetail.IsCorrect = isCorrect;
+
+                // Kelime ilerlemesini güncelle (doğru veya yanlış)
                 var wordLog = new WordLog
                 {
                     UserId = userId,
                     WordId = quizDetail.WordId,
                     LogDate = DateTime.UtcNow,
-                    IsCorrect = true
+                    IsCorrect = isCorrect
                 };
                 _context.WordLogs.Add(wordLog);
+
+                // QuizSchedule'ı güncelle
+                var schedule = await _context.QuizSchedules
+                    .FirstOrDefaultAsync(qs => 
+                        qs.UserId == userId && 
+                        qs.WordId == quizDetail.WordId);
+
+                if (schedule != null)
+                {
+                    if (isCorrect)
+                    {
+                        schedule.AttemptCount++;
+                        schedule.LastUpdatedAt = today;
+                        
+                        // Bir sonraki test tarihini belirle
+                        switch(schedule.AttemptCount)
+                        {
+                            case 1: 
+                                schedule.NextTestDate = today.AddDays(1);     // 1 gün
+                                break;
+                            case 2: 
+                                schedule.NextTestDate = today.AddDays(7);     // 1 hafta
+                                break;
+                            case 3: 
+                                schedule.NextTestDate = today.AddMonths(1);   // 1 ay
+                                break;
+                            case 4: 
+                                schedule.NextTestDate = today.AddMonths(3);   // 3 ay
+                                break;
+                            case 5: 
+                                schedule.NextTestDate = today.AddMonths(6);   // 6 ay
+                                                               break;
+                            case 6: 
+                                schedule.NextTestDate = today.AddYears(1);    // 1 yıl
+                                schedule.IsCompleted = true;
+                                
+                                // LearnedWords tablosuna ekle
+                                var learnedWord = new LearnedWord 
+                                { 
+                                    UserId = userId,
+                                    WordId = quizDetail.WordId,
+                                    LearnedDate = today
+                                };
+                                _context.LearnedWords.Add(learnedWord);
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        // Yanlış cevap - süreci başa döndür
+                        schedule.AttemptCount = 0;
+                        schedule.NextTestDate = today.AddDays(1); // Tekrar 1. aşamadan başla
+                        schedule.LastUpdatedAt = today;
+                    }
+                }
+            }
+               else // Atlama durumu
+            {
+                // Soruyu atlama durumunda yanlış olarak işaretle
+                quizDetail.IsCorrect = false;
+                
+                // Kelime ilerlemesini yanlış olarak kaydet
+                var wordLog = new WordLog
+                {
+                    UserId = userId,
+                    WordId = quizDetail.WordId,
+                    LogDate = DateTime.UtcNow,
+                    IsCorrect = false
+                };
+                _context.WordLogs.Add(wordLog);
+
+                // Schedule'ı sıfırla
+                var schedule = await _context.QuizSchedules
+                    .FirstOrDefaultAsync(qs => 
+                        qs.UserId == userId && 
+                        qs.WordId == quizDetail.WordId);
+
+                if (schedule != null)
+                {
+                    schedule.AttemptCount = 0;
+                    schedule.NextTestDate = today.AddDays(1);
+                    schedule.LastUpdatedAt = today;
+                }
             }
 
+            // Her durumda soruyu işaretlenmiş olarak kaydet
+
+            quizDetail.IsAnswered = true;
             await _context.SaveChangesAsync();
 
-            // Quiz'in ID'sini al ve Take action'ına yönlendir
+            // QuizIDsini al ve take actiona yönlendir
             return RedirectToAction(nameof(Take), new { id = quizDetail.QuizId });
         }
 
@@ -267,6 +329,167 @@ namespace WordRace000.Controllers
             }
 
             return View(quiz);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CheckSampleSentences()
+        {
+            // Tüm kelime-örnek cümle ilişkilerini getir
+            var allWordSamples = await _context.WordSampleWords
+                .Include(wsw => wsw.WordSample)
+                .Include(wsw => wsw.Word)
+                .Take(10) // İlk 10 kaydı al
+                .ToListAsync();
+
+             var result = allWordSamples.Select(wsw => new
+            {
+                WordId = wsw.WordId,
+                Word = wsw.Word?.English,
+                SampleId = wsw.WordSampleId,
+                SampleText = wsw.WordSample?.SampleText
+            }).ToList();
+
+            return Json(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CheckCurrentWord(int quizId)
+        {
+            var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+            
+                      var quiz = await _context.Quizzes
+                .Include(q => q.QuizDetails)
+                .ThenInclude(qd => qd.Word)
+                .FirstOrDefaultAsync(q => q.Id == quizId && q.UserId == userId);
+
+            if (quiz == null)
+            {
+                return Json(new { error = "Quiz bulunamadı" });
+            }
+
+            var currentQuestion = quiz.QuizDetails
+                .FirstOrDefault(qd => !qd.IsCorrect);
+
+            if (currentQuestion == null)
+            {
+                return Json(new { error = "Aktif soru bulunamadı" });
+            }
+
+            // Kelimeye ait örnek cümleleri getir
+            var sampleSentences = await _context.WordSampleWords
+                .Include(wsw => wsw.WordSample)
+                .Where(wsw => wsw.WordId == currentQuestion.WordId)
+                .Select(wsw => new
+                {
+                    WordSampleWordId = wsw.Id,
+                    WordId = wsw.WordId,
+                    WordSampleId = wsw.WordSampleId,
+                    SampleText = wsw.WordSample.SampleText
+                })
+                .ToListAsync();
+
+            return Json(new
+            {
+                wordId = currentQuestion.WordId,
+                word = currentQuestion.Word.English,
+                sampleSentences = sampleSentences
+            });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CheckMissingSentences()
+        {
+                 // Tüm kelimeleri ve örnek cümle sayılarını getir
+            var wordStats = await _context.Words
+                .Select(w => new
+                {
+                    WordId = w.Id,
+                    English = w.English,
+                    SampleSentenceCount = _context.WordSampleWords
+                        .Count(wsw => wsw.WordId == w.Id)
+                })
+                .OrderBy(w => w.SampleSentenceCount)
+                .Take(20)  // İlk 20 kelimeyi göster
+                .ToListAsync();
+
+               return Json(new
+            {
+                totalWords = await _context.Words.CountAsync(),
+                wordsWithNoSentences = await _context.Words
+                    .CountAsync(w => !_context.WordSampleWords.Any(wsw => wsw.WordId == w.Id)),
+                sampleWords = wordStats
+            });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ListWordsWithoutSentences()
+        {
+           // Örnek cümlesi olmayan kelimeleri kategorilerine göre grupla
+            var wordsWithoutSentences = await _context.Words
+                .Include(w => w.Category)  // Category'yi include et
+                .Where(w => !_context.WordSampleWords.Any(wsw => wsw.WordId == w.Id))
+                .OrderBy(w => w.English)
+                .Select(w => new
+                {
+                    w.Id,
+                    w.English,
+                    w.Turkish,
+                    CategoryName = w.Category != null ? w.Category.CategoryName : "Uncategorized"
+                })
+                .ToListAsync();
+
+            // Kelimeleri kategorilerine göre grupla
+            var groupedWords = wordsWithoutSentences
+                .GroupBy(w => w.CategoryName)
+                .Select(g => new
+                {
+                    Category = g.Key,
+                    Words = g.Select(w => new
+                    {
+                        w.Id,
+                        w.English,
+                        w.Turkish
+                    }).ToList()
+                })
+                .OrderBy(g => g.Category)
+                .ToList();
+
+            // Sonuçları HTML olarak göster
+            return View(groupedWords);
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddSampleSentences([FromBody] List<WordSentence> sentences)
+        {
+
+            foreach (var sentence in sentences)
+            {
+                var wordSample = new WordSample
+                {
+                    SampleText = sentence.SampleText
+                };
+                _context.WordSample.Add(wordSample);
+                await _context.SaveChangesAsync();
+
+                var wordSampleWord = new WordSampleWord
+                {
+                    WordId = sentence.WordId,
+                    WordSampleId = wordSample.Id
+                };
+                _context.WordSampleWords.Add(wordSampleWord);
+            }
+
+            await _context.SaveChangesAsync();
+            return Json(new { success = true });
+
+        }
+
+        public class WordSentence
+        {
+            public int WordId { get; set; }
+            public string SampleText { get; set; }
+
         }
     }
 }
